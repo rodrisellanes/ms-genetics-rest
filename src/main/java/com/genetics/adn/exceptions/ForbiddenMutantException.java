@@ -1,11 +1,20 @@
 package com.genetics.adn.exceptions;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
-public class ForbiddenMutantException extends HttpClientErrorException {
+public class ForbiddenMutantException extends RuntimeException {
+
+    private static final String MENSAJE_ERROR = HttpStatus.FORBIDDEN.toString();
 
     public ForbiddenMutantException() {
-        super(HttpStatus.FORBIDDEN);
+        super(MENSAJE_ERROR);
+    }
+
+    public ForbiddenMutantException(String mensaje) {
+        super(mensaje);
+    }
+
+    public ForbiddenMutantException(String s, Throwable throwable) {
+        super(s, throwable);
     }
 }

@@ -23,6 +23,7 @@ public class ScanDNAService {
     private static final int NO_MUTANTE = 0;
     private static final int PATRON_MUTANTE_ENCONTRADO = 1;
     private static final int INTERVALO_LECTURA_NUCLEOTIDOS = 4;
+    private static final int UMBRAL_ES_MUTANTE = 2;
     private final Map<String, Integer> secuenciasADNMutante;
 
     @Autowired
@@ -47,7 +48,7 @@ public class ScanDNAService {
     }
 
     private Boolean isMutant(String[] adn) {
-        return buscarPatronesMutantes(getSecuenciasMultiplesADN(adn)) > 1;
+        return buscarPatronesMutantes(getSecuenciasMultiplesADN(adn)) >= UMBRAL_ES_MUTANTE;
     }
 
     private Stream<String> getSecuenciasMultiplesADN(String[] adn) {

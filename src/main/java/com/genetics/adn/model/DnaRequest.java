@@ -1,9 +1,11 @@
 package com.genetics.adn.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class DnaRequest {
 
-    private String[] dna;
+    @JsonProperty("dna")
+    private String[] adn;
 }
