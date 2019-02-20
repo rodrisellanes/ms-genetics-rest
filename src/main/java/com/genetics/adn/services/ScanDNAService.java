@@ -1,5 +1,6 @@
 package com.genetics.adn.services;
 
+import com.genetics.adn.daos.GeneticsDao;
 import com.genetics.adn.exceptions.ForbiddenMutantException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,12 @@ public class ScanDNAService {
     private static final int INTERVALO_LECTURA_NUCLEOTIDOS = 4;
     private static final int UMBRAL_ES_MUTANTE = 2;
     private final Map<String, Integer> secuenciasADNMutante;
+    private final GeneticsDao geneticsDao;
 
     @Autowired
-    public ScanDNAService() {
+    public ScanDNAService(GeneticsDao geneticsDao) {
 
+        this.geneticsDao = geneticsDao;
         secuenciasADNMutante = new HashMap<>();
         secuenciasADNMutante.put("AAAA", PATRON_MUTANTE_ENCONTRADO);
         secuenciasADNMutante.put("TTTT", PATRON_MUTANTE_ENCONTRADO);
@@ -39,6 +42,7 @@ public class ScanDNAService {
     public Mono<Void> getMutant(String[] adn) {
         return Mono.just(adn)
                 .map(this::isMutant)
+                .flatMap(esMutante -> geneticsDao.saveADNIndividuo(adn, esMutante))
 //                .flatMap(Function.identity()) REDIS (pub/sub)
                 .handle(resultadoADN())
                 .doOnSuccess(esMutante -> log.info("El ADN recibido pertenece a un individuo mutante"))
@@ -88,22 +92,22 @@ public class ScanDNAService {
                 .filter(secuencia -> secuencia.length() >= INTERVALO_LECTURA_NUCLEOTIDOS);
     }
 
+    private Stream<String> getSecuenciasHorizontales(String[] adn) {
+        return Arrays.stream(adn)
+                .filter(sec -> sec.length() >= INTERVALO_LECTURA_NUCLEOTIDOS);
+    }
+
     private Stream<String> getSecuenciasVertiales(String[] adn) {
         List<String> secuenciasVertiales = new LinkedList<>();
 
-        for(int c = 0 ; c < adn.length - 1 ; c++) {
+        for(int c = 0 ; c < adn.length ; c++) {
             StringBuilder secuenciaV = new StringBuilder();
-            for(int f = 0 ; f < adn.length - 1 ; f++) {
-                secuenciaV.append(adn[f].charAt(c));
+            for (String anAdn : adn) {
+                secuenciaV.append(anAdn.charAt(c));
             }
             secuenciasVertiales.add(secuenciaV.toString());
         }
         return secuenciasVertiales.stream()
-                .filter(sec -> sec.length() >= INTERVALO_LECTURA_NUCLEOTIDOS);
-    }
-
-    private Stream<String> getSecuenciasHorizontales(String[] adn) {
-        return Arrays.stream(adn)
                 .filter(sec -> sec.length() >= INTERVALO_LECTURA_NUCLEOTIDOS);
     }
 
