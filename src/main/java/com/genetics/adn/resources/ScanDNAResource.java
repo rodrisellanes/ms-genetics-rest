@@ -42,6 +42,7 @@ public class ScanDNAResource {
     private String[] validarSecuenciaCompleta(String[] adn) {
         Integer dimension = (adn.length) * (adn.length);
         Predicate<Integer> dimensionCuadrada = totalNucleotidos -> ((double) totalNucleotidos / dimension) == 1;
+
         Stream.of(adn)
                 .map(String::length)
                 .reduce((a, b) -> a + b)

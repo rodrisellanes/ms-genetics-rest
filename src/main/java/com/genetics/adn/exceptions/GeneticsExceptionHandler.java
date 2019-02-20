@@ -23,4 +23,11 @@ public class GeneticsExceptionHandler {
         return String.format("ERROR CODIGO(%s): Secuencia de ADN invalida", ex.getMessage());
     }
 
+    @ExceptionHandler(DataBaseConnectionException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public String handle(DataBaseConnectionException ex) {
+        return String.format("ERROR CODIGO(%s): conexion con la Base de Datos interrumpida", ex.getMessage());
+    }
+
 }
