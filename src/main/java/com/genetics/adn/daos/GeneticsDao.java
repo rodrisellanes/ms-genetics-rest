@@ -36,7 +36,7 @@ public class GeneticsDao {
                     insertSQL,
                     params);
         })
-                .doOnSuccess(idDb -> log.info("Insert en base de datos ejecutado exitosamente, id: {}, esMutante: {}", idDb, mutante))
+                .doOnSuccess(idDb -> log.info("Insert en base de datos ejecutado exitosamente, id: {}, mutante: {}", idDb, mutante))
                 .map(idDb -> mutante)
                 .onErrorMap(DataAccessException.class, DataBaseConnectionException::new)
                 .doOnError(err -> log.error("Error en operacion insert ADN individo", err))
