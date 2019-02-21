@@ -10,9 +10,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Slf4j
 @Component
@@ -46,16 +46,19 @@ public class GeneticsDao {
     public Mono<StatsResponse> getADNStats() {
 
         return Mono.fromCallable(() -> {
-            String querySql = "select sum(case when mutante then 1 end) contador_adn_mutante, sum(case when not mutante then 1 end) contador_adn_humano, sum(case when mutante then 1.0 else 0 end) / count(1) ratio from adn.adn_evaluados";
+            String querySql = "select coalesce(sum(case when mutante then 1 end), 0) contador_adn_mutante, coalesce(sum(case when not mutante then 1 end), 0) contador_adn_humano, coalesce(sum(case when mutante then 1.0 else 0 end) / count(1), 0) ratio from adn.adn_evaluados";
             return jdbcTemplate.query(
                     querySql,
                     new BeanPropertyRowMapper<>(StatsResponse.class));
         })
-                .defaultIfEmpty(Collections.singletonList(StatsResponse.builder().build()))
-                .map(queryResult -> queryResult.stream().findFirst().get())
+                .map(queryResult -> queryResult.stream().findFirst().orElseThrow(errorResultHandler()))
                 .doOnSuccess(stats -> log.info("Query en base de datos ejecutada exitosamente"))
                 .onErrorMap(DataAccessException.class, DataBaseConnectionException::new)
                 .doOnError(err -> log.error("Error en operacion getADNStats", err))
                 .doOnSubscribe(sub -> log.info("Se ejecuta operacion query (getStats) de base da datos"));
+    }
+
+    private Supplier<DataBaseConnectionException> errorResultHandler() {
+        return () -> new DataBaseConnectionException("No se pudieron obtener registros de la base de datos");
     }
 }

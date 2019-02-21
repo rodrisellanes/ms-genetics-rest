@@ -2,7 +2,7 @@ package com.genetics.adn.resources;
 
 import com.genetics.adn.exceptions.BadRequestMutantException;
 import com.genetics.adn.model.DnaRequest;
-import com.genetics.adn.services.ScanDNAService;
+import com.genetics.adn.services.ScanDNAServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,11 +20,11 @@ import java.util.stream.Stream;
 @RestController
 public class ScanDNAResource {
 
-    private final ScanDNAService scanDNAService;
+    private final ScanDNAServiceImpl scanDNAServiceImpl;
 
     @Autowired
-    public ScanDNAResource(ScanDNAService scanDNAService) {
-        this.scanDNAService = scanDNAService;
+    public ScanDNAResource(ScanDNAServiceImpl scanDNAServiceImpl) {
+        this.scanDNAServiceImpl = scanDNAServiceImpl;
     }
 
     @PostMapping(value = "/api/v1.0/genetics/mutant",
@@ -35,7 +35,7 @@ public class ScanDNAResource {
         return Mono.just(adnRequest.getAdn())
                 .map(this::validarSecuenciaCompleta)
                 .doOnError(err -> log.error("ADN request invalido, no cumple con dimension matriz cuadrada"))
-                .flatMap(scanDNAService::getMutant)
+                .flatMap(scanDNAServiceImpl::getMutant)
                 .doOnSubscribe(sub -> log.info("API - Mutant: request DNA: {} para analisis de mutante", (Object) adnRequest.getAdn()));
     }
 

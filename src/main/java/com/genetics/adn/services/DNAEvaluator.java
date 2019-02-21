@@ -1,37 +1,29 @@
 package com.genetics.adn.services;
 
-import com.genetics.adn.daos.GeneticsDao;
-import com.genetics.adn.exceptions.ForbiddenMutantException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.SynchronousSink;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Slf4j
-@Service
-public class ScanDNAService {
+@Component
+public class DNAEvaluator {
 
     private static final int NO_MUTANTE = 0;
     private static final int PATRON_MUTANTE_ENCONTRADO = 1;
     private static final int INTERVALO_LECTURA_NUCLEOTIDOS = 4;
     private static final int UMBRAL_ES_MUTANTE = 2;
     private final Map<String, Integer> secuenciasADNMutante;
-    private final GeneticsDao geneticsDao;
 
     @Autowired
-    public ScanDNAService(GeneticsDao geneticsDao) {
-
-        this.geneticsDao = geneticsDao;
+    public DNAEvaluator() {
         secuenciasADNMutante = new HashMap<>();
         secuenciasADNMutante.put("AAAA", PATRON_MUTANTE_ENCONTRADO);
         secuenciasADNMutante.put("TTTT", PATRON_MUTANTE_ENCONTRADO);
@@ -39,34 +31,22 @@ public class ScanDNAService {
         secuenciasADNMutante.put("CCCC", PATRON_MUTANTE_ENCONTRADO);
     }
 
-    public Mono<Void> getMutant(String[] adn) {
-        return Mono.just(adn)
-                .map(this::isMutant)
-                .flatMap(esMutante -> geneticsDao.saveADNIndividuo(adn, esMutante))
-//                .flatMap(Function.identity()) REDIS (pub/sub)
-                .handle(resultadoADN())
-                .doOnSuccess(esMutante -> log.info("El ADN recibido pertenece a un individuo mutante"))
-                .doOnError(err -> log.warn("El ADN recibido pertenece a un individuo humano"))
-                .doOnSubscribe(sub -> log.info("Ejecutando servicio de analisis de ADN mutante"))
-                .then();
-    }
-
-    private Boolean isMutant(String[] adn) {
+    public Boolean isMutant(String[] adn) {
         return buscarPatronesMutantes(getSecuenciasMultiplesADN(adn)) >= UMBRAL_ES_MUTANTE;
     }
 
     private Stream<String> getSecuenciasMultiplesADN(String[] adn) {
         log.info("Obteniendo las multiples secuencias de nucleotidos de forma (Horizontal, Vertical y Diagonales");
         return Stream.concat(
-                    Stream.concat(
-                            getSecuenciasDiagonales(adn),
-                            getSecuenciasDiagonales(invertirADN(adn))
-                    ),
-                    Stream.concat(
-                            getSecuenciasHorizontales(adn),
-                            getSecuenciasVertiales(adn)
-                    )
-            );
+                Stream.concat(
+                        getSecuenciasDiagonales(adn),
+                        getSecuenciasDiagonales(invertirADN(adn))
+                ),
+                Stream.concat(
+                        getSecuenciasHorizontales(adn),
+                        getSecuenciasVertiales(adn)
+                )
+        );
     }
 
     private String[] invertirADN(String[] adn) {
@@ -132,15 +112,4 @@ public class ScanDNAService {
             return patronesMutantes;
         };
     }
-
-    private BiConsumer<Boolean, SynchronousSink<Object>> resultadoADN() {
-        return (esMutante, sync) -> {
-            if(esMutante) {
-                sync.complete();
-            } else {
-                sync.error(new ForbiddenMutantException());
-            }
-        };
-    }
-
 }
