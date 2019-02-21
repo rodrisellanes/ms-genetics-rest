@@ -39,7 +39,7 @@ public class ScanDNAServiceImpl {
 
     private Function<EvaluatedDNA, EvaluatedDNA> publishAND() {
         return evaluatedDNA -> {
-            redisPublisher.publish(evaluatedDNA.toString());
+            redisPublisher.publish(evaluatedDNA);
             log.info("Publish de ADN en Redis OK");
             return evaluatedDNA;
         };

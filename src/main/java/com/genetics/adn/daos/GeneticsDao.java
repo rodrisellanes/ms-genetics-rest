@@ -5,6 +5,7 @@ import com.genetics.adn.model.StatsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -36,8 +38,9 @@ public class GeneticsDao {
                     insertSQL,
                     params);
         })
-                .doOnSuccess(idDb -> log.info("Insert en base de datos ejecutado exitosamente, id: {}, mutante: {}", idDb, mutante))
+                .doOnSuccess(idDb -> log.info("Insert en base de datos exitososo, id: {}, mutante: {}", idDb, mutante))
                 .map(idDb -> mutante)
+                .onErrorResume(DuplicateKeyException.class, handleDuplicateKeyException())
                 .onErrorMap(DataAccessException.class, DataBaseConnectionException::new)
                 .doOnError(err -> log.error("Error en operacion insert ADN individo", err))
                 .doOnSubscribe(sub -> log.info("Se ejecuta operacion insert (saveADN) de base da datos, individuoMutante: {}", mutante));
@@ -60,5 +63,12 @@ public class GeneticsDao {
 
     private Supplier<DataBaseConnectionException> errorResultHandler() {
         return () -> new DataBaseConnectionException("No se pudieron obtener registros de la base de datos");
+    }
+
+    private Function<DuplicateKeyException, Mono<? extends Boolean>> handleDuplicateKeyException() {
+        return err -> {
+            log.error("El ADN analizado ya existen en la tabla adn_evaluados, no se inserta");
+            return Mono.empty();
+        };
     }
 }

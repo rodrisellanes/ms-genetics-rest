@@ -1,6 +1,5 @@
 package com.genetics.adn.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genetics.adn.model.EvaluatedDNA;
 import com.genetics.adn.queue.MessagePublisher;
 import com.genetics.adn.queue.RedisMessagePublisher;
@@ -13,13 +12,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 @Configuration
 public class RedisConfig {
 
-    private static final String PUB_SUB_DNA_QUEUE = "pubsub:dnaQueue";
+    private static final String PUB_SUB_DNA_QUEUE = "DNA_QUEUE";
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
@@ -35,10 +33,10 @@ public class RedisConfig {
     }
 
     @Bean
-    RedisTemplate<String, String> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
+    RedisTemplate<String, EvaluatedDNA> redisTemplate(LettuceConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, EvaluatedDNA> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(EvaluatedDNA.class));
         return template;
     }
 
@@ -48,7 +46,7 @@ public class RedisConfig {
     }
 
     @Bean
-    MessagePublisher redisPublisher(RedisTemplate<String, String> redisTemplate) {
+    MessagePublisher redisPublisher(RedisTemplate<String, EvaluatedDNA> redisTemplate) {
         return new RedisMessagePublisher(redisTemplate, topic());
     }
 

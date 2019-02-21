@@ -1,41 +1,54 @@
 package com.genetics.adn.queue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genetics.adn.daos.GeneticsDao;
+import com.genetics.adn.exceptions.InternalServerError;
+import com.genetics.adn.model.EvaluatedDNA;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.DefaultMessage;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 @Slf4j
 @Service
 public class RedisMessageSubscriber implements MessageListener {
 
     private final GeneticsDao geneticsDao;
+    private final Jackson2JsonRedisSerializer<EvaluatedDNA> redisSerializer;
 
     @Autowired
     public RedisMessageSubscriber(GeneticsDao geneticsDao) {
         this.geneticsDao = geneticsDao;
+        redisSerializer = new Jackson2JsonRedisSerializer<>(EvaluatedDNA.class);
+        redisSerializer.setObjectMapper(new ObjectMapper());
     }
 
 
     @Override
     public void onMessage(Message mensaje, @Nullable byte[] bytes) {
-
-        // TODO do some logic
-        // FIXME have to user Jackson Deserializer
         try {
-            System.out.println(Thread.currentThread().getName());
-            System.out.println(mensaje.toString());
-            Thread.sleep(2000L);
-            Boolean mutante = Boolean.valueOf(mensaje.toString().split("=")[2].replace("\"", "").replace(")", ""));
-            this.geneticsDao.saveADNIndividuo((mensaje).toString().split("="), mutante).subscribe();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.info("Recibio mensaje en Queue (ADN_QUEUE)");
+            val adnLeido = redisSerializer.deserialize(mensaje.getBody());
+            this.geneticsDao.saveADNIndividuo(
+                    adnLeido.getAdn(),
+                    adnLeido.isMutante()
+            )
+                    .delaySubscription(Duration.ofMillis(1L))
+                    .subscribe();
+        } catch(SerializationException ex) {
+            log.error("Error en la deserializacion del EvaluatedDAN: {}", mensaje.toString());
+            throw new InternalServerError(ex);
         }
     }
+
 }

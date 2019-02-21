@@ -30,4 +30,11 @@ public class GeneticsExceptionHandler {
         return String.format("ERROR CODIGO(%s): conexion con la Base de Datos interrumpida", ex.getMessage());
     }
 
+    @ExceptionHandler(InternalServerError.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public String handle(InternalServerError ex) {
+        return String.format("ERROR CODIGO(%s): error en logica del servidor", ex.getMessage());
+    }
+
 }

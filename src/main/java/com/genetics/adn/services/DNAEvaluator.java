@@ -31,7 +31,7 @@ public class DNAEvaluator {
         secuenciasADNMutante.put("CCCC", PATRON_MUTANTE_ENCONTRADO);
     }
 
-    public Boolean isMutant(String[] adn) {
+    protected Boolean isMutant(String[] adn) {
         return buscarPatronesMutantes(getSecuenciasMultiplesADN(adn)) >= UMBRAL_ES_MUTANTE;
     }
 

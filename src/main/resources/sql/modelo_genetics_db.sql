@@ -7,7 +7,8 @@ create schema adn;
 
 create table adn.adn_evaluados(
   id serial primary key,
-  adn varchar(400) not null,
+  adn text not null,
   mutante boolean not null,
-  fecha_creacion timestamp default now()
-);
+  fecha_creacion timestamp default now(),
+  unique(adn)
+)

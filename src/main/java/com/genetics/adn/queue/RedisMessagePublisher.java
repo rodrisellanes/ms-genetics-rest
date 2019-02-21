@@ -1,5 +1,6 @@
 package com.genetics.adn.queue;
 
+import com.genetics.adn.model.EvaluatedDNA;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,17 +11,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisMessagePublisher implements MessagePublisher {
 
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, EvaluatedDNA> redisTemplate;
     private ChannelTopic topic;
 
     @Autowired
-    public RedisMessagePublisher(RedisTemplate<String, String> redisTemplate, ChannelTopic topic) {
+    public RedisMessagePublisher(RedisTemplate<String, EvaluatedDNA> redisTemplate, ChannelTopic topic) {
         this.redisTemplate = redisTemplate;
         this.topic = topic;
     }
 
     @Override
-    public void publish(String mensaje) {
+    public void publish(EvaluatedDNA mensaje) {
         redisTemplate.convertAndSend(topic.getTopic(), mensaje);
     }
 }
