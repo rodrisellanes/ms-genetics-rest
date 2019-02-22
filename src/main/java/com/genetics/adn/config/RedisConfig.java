@@ -4,6 +4,7 @@ import com.genetics.adn.model.EvaluatedDNA;
 import com.genetics.adn.queue.MessagePublisher;
 import com.genetics.adn.queue.RedisMessagePublisher;
 import com.genetics.adn.queue.RedisMessageSubscriber;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -20,8 +21,10 @@ public class RedisConfig {
     private static final String PUB_SUB_DNA_QUEUE = "DNA_QUEUE";
 
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+    public LettuceConnectionFactory redisConnectionFactory(
+            @Value("${spring.redis.host:localhost}") String host,
+            @Value("${spring.redis.port:6379}") Integer port) {
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
     }
 
     @Bean

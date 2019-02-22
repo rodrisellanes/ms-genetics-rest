@@ -30,11 +30,10 @@ public class RedisMessageSubscriber implements MessageListener {
         redisSerializer.setObjectMapper(new ObjectMapper());
     }
 
-
     @Override
     public void onMessage(Message mensaje, @Nullable byte[] bytes) {
         try {
-            log.info("Recibio mensaje en Queue (ADN_QUEUE)");
+            log.info("Recibe mensaje en Queue (ADN_QUEUE)");
             val adnLeido = redisSerializer.deserialize(mensaje.getBody());
             this.geneticsDao.saveADNIndividuo(
                     adnLeido.getAdn(),

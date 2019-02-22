@@ -38,7 +38,7 @@ public class GeneticsDao {
                     insertSQL,
                     params);
         })
-                .doOnSuccess(idDb -> log.info("Insert en base de datos exitososo, id: {}, mutante: {}", idDb, mutante))
+                .doOnSuccess(idDb -> log.info("Insert en base de datos exitoso, id: {}, mutante: {}", idDb, mutante))
                 .map(idDb -> mutante)
                 .onErrorResume(DuplicateKeyException.class, handleDuplicateKeyException())
                 .onErrorMap(DataAccessException.class, DataBaseConnectionException::new)

@@ -1,6 +1,7 @@
 package com.genetics.adn.services;
 
 import com.genetics.adn.exceptions.ForbiddenMutantException;
+import com.genetics.adn.exceptions.InternalServerError;
 import com.genetics.adn.model.EvaluatedDNA;
 import com.genetics.adn.queue.RedisMessagePublisher;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +33,20 @@ public class ScanDNAServiceImpl {
                 .map(publishAND())
                 .handle(resultadoADN())
                 .doOnSuccess(esMutante -> log.info("El ADN recibido pertenece a un individuo mutante"))
-                .doOnError(err -> log.warn("El ADN recibido pertenece a un individuo humano"))
+                .doOnError(ForbiddenMutantException.class, err -> log.warn("El ADN recibido pertenece a un individuo humano"))
                 .doOnSubscribe(sub -> log.info("Ejecutando servicio de analisis de ADN mutante"))
                 .then();
     }
 
     private Function<EvaluatedDNA, EvaluatedDNA> publishAND() {
         return evaluatedDNA -> {
-            redisPublisher.publish(evaluatedDNA);
-            log.info("Publish de ADN en Redis OK");
+            try {
+                log.info("Publica mensaje en Queue (ADN_QUEUE)");
+                redisPublisher.publish(evaluatedDNA);
+            } catch(RuntimeException ex) {
+                log.error("Error al pulicar mensaje en Queue (ADN_QUEUE)");
+                throw new InternalServerError(ex);
+            }
             return evaluatedDNA;
         };
     }
