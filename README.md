@@ -42,6 +42,8 @@ Levantar los contenedores de Postgres y Redis
 1) docker run --name mutant-rest -d redis
 2) docker run --rm -d -it -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_DB=genetics postgres:latest -c max_connections=200
 
+- En Linux usar `psql -h localhost -p 5432 --username=postgres` y ejecutar los scripts que se encuentran en ms-genetics-rest/.../resources/sql/__model_genetics_db.sql__ con el fin de crear el schema y la tabla
+
 **Desde Git Hub**
 
 1) git clone https://github.com/rodrisellanes/ms-genetics-rest.git 
