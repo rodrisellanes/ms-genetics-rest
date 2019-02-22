@@ -1,0 +1,138 @@
+{
+	"info": {
+		"name": "ms-genetics-rest",
+		"_postman_id": "8631d6f7-b706-46c4-d098-ca29fbb672ef",
+		"description": "DNA scanner looking for mutants\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "API - /mutant (human DNA)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dna\": [\"AAGGGG\",\"CAGTGC\",\"CCCTGT\",\"AAAAGG\",\"CACCTA\",\"TCACTG\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1.0/genetics/mutant",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1.0",
+						"genetics",
+						"mutant"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "API - /mutant (Mutant DNA)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dna\": [\"AGAA\", \"AACC\", \"ACGC\", \"TTTT\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1.0/genetics/mutant",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1.0",
+						"genetics",
+						"mutant"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "API - /stats (Statistics evaluated DNA)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dna\": [\"TTTATTT\",\"CAGTGC\",\"TTATGT\",\"AAAAGG\",\"CACCTA\",\"TCACTG\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1.0/genetics/stats",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1.0",
+						"genetics",
+						"stats"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "API - /mutant (invalid DNA sequence)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dna\": [\"TTTCCA\",\"CAAAGC\",\"CCCT\",\"AAAAGG\",\"CACCTA\",\"GACTTG\"]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1.0/genetics/mutant",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1.0",
+						"genetics",
+						"mutant"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
