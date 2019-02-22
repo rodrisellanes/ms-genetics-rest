@@ -59,4 +59,8 @@ Crear una imagen de Docker del ms
 1) docker pull rodrisella/ms-genetics-rest:1.1.0 (latest)
 2) docker run --network host -p 8080:8080 ms-genetics-rest:[tag]
  
- NOTA: En caso de parecer mas practico usar docker-compose (postgres, redis, ms-genetics-rest)
+**Link Postman-collection**
+URL: https://www.getpostman.com/collections/8185d838ed2657365a93
+En el proyecto `.../root/postman-collection/` se encuentra el JSON de postman para importar manual 
+
+NOTA: En caso de parecer mas practico usar docker-compose (postgres, redis, ms-genetics-rest)
