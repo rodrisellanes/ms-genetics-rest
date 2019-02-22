@@ -1,5 +1,5 @@
 # ms-genetics-rest
-####`VISION GENERAL`
+####VISION GENERAL
  
 API REST que analiza y evalua si un ADN pertenece a un individuo "mutante" o "humano". 
 El mismo esta pensado para tolerar flucuationes agresivas de trafico, ya que fue diseñado 
@@ -11,12 +11,12 @@ El microservicio cuenta con 2 endpoints expuestos:
 * /stats    (__GET__)       "Devuelve las estadisticas de mutantes, humanos y ratio"
 
 Respuesta de la API
-* Si el ADN enviado para ser evaluado es de un `mutante`, el servicio responde un codigo HTTP 200-OK
-* Si el ADN enviado para ser evaluado es de un `humano`, el servicio responde un codigo HTTP 203-FORBIDDEN
-* Si el ADN enviado no es de dimension `NxN`, el servicio responde un codigo HTTP 400-BAD_REQUEST
-* Si por alguna razon: conexion fallida con Redis, con Postgres o un error no contemplado, el servicio responde un codigo HTTP 500-INTERNAL_SERVER_ERROR
+* Si el ADN enviado para ser evaluado es de un `mutante`, el servicio responde un codigo **HTTP 200-OK**
+* Si el ADN enviado para ser evaluado es de un `humano`, el servicio responde un codigo **HTTP 203-FORBIDDEN**
+* Si el ADN enviado no es de dimension `NxN`, el servicio responde un codigo **HTTP 400-BAD_REQUEST**
+* Si por alguna razon: conexion fallida con Redis, con Postgres o un error no contemplado, el servicio responde un codigo **HTTP 500-INTERNAL_SERVER_ERROR**
 
-####`EJEMPLO DE USO`
+####EJEMPLO DE USO
 
 *Evaluar ADN*
 
@@ -35,7 +35,7 @@ Respuesta de la API
 - METHOD: GET
 
 
-####` AMBIENTE LOCAL (PRUEBAS Y DESARROLLO)`
+####AMBIENTE LOCAL (PRUEBAS Y DESARROLLO)
 
 Levantar los contenedores de Postgres y Redis
 
