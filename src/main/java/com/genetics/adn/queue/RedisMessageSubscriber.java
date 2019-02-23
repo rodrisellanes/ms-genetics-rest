@@ -13,6 +13,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 
@@ -32,19 +34,20 @@ public class RedisMessageSubscriber implements MessageListener {
 
     @Override
     public void onMessage(Message mensaje, @Nullable byte[] bytes) {
-        try {
-            log.info("Recibe mensaje en Queue (ADN_QUEUE)");
-            val adnLeido = redisSerializer.deserialize(mensaje.getBody());
-            this.geneticsDao.saveADNIndividuo(
-                    adnLeido.getAdn(),
-                    adnLeido.isMutante()
-            )
-                    .delaySubscription(Duration.ofMillis(1L))
-                    .subscribe();
-        } catch(SerializationException ex) {
-            log.error("Error en la deserializacion del EvaluatedDAN: {}", mensaje.toString());
-            throw new InternalServerError(ex);
-        }
+
+        Mono.just(mensaje.getBody())
+                .map(redisSerializer::deserialize)
+                .flatMap(adnLeido -> geneticsDao.saveADNIndividuo(
+                        adnLeido.getAdn(),
+                        adnLeido.isMutante())
+                )
+                .map(a -> new Exception(""))
+                .onErrorMap(SerializationException.class, InternalServerError::new)
+                .doOnError(InternalServerError.class, err -> log.error("Error en la deserializacion del EvaluatedDAN: {}", mensaje.toString()))
+                .doOnSubscribe(sub -> log.info("Recibe mensaje en Queue (ADN_QUEUE)"))
+                .delaySubscription(Duration.ofMillis(1L))
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
 }
