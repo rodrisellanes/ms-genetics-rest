@@ -51,12 +51,13 @@ Levantar los contenedores de Postgres y Redis
 3) ./gradlew bootRun
 
 Crear una imagen de Docker del ms
+
 4) cd ms-genetics-rest
 5) docker build -f Dockerfile -t ms-genetics-rest:[tag] .
 
 **Desde Docker Hub**
 
-1) docker pull rodrisella/ms-genetics-rest:1.1.0 (latest)
+1) docker pull rodrisella/ms-genetics-rest:[tag] (latest)
 2) docker run --network host -p 8080:8080 ms-genetics-rest:[tag]
  
 **Link Postman-collection**

@@ -21,9 +21,9 @@ DEPLOY IN AWS EC2
 
 3) Ready to run your docker container
 
-    * docker pull rodrisella/ms-genetics-rest:1.1.1 (OPTIONAL)
+    * docker pull rodrisella/ms-genetics-rest:[tag] (OPTIONAL)
     
-    * docker run --name mutante_api -d --network host -p 8080:8080 ms-genetics-rest:1.1.1
+    * sudo docker run --name mutante_api -d --network host -p 8080:8080 ms-genetics-rest:[tag]
     * sudo docker run --name mutant_redis -p 6379:6379 -d redis
     * sudo docker run --name mutante_db -d -it -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_DB=genetics postgres:latest -c max_connections=200
 
