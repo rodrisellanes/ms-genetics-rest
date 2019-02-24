@@ -103,7 +103,7 @@ public class DNAEvaluator {
         return secuencia -> {
             int patronesMutantes = 0;
             for(int i = 0 ; i <= (secuencia.length() - 4) ; i++) {
-                String subSecuencia = secuencia.substring(i, INTERVALO_LECTURA_NUCLEOTIDOS);
+                String subSecuencia = secuencia.substring(i, INTERVALO_LECTURA_NUCLEOTIDOS + i);
                 if(secuenciasADNMutante.getOrDefault(subSecuencia, NO_MUTANTE) == PATRON_MUTANTE_ENCONTRADO) {
                     i += 3;
                     patronesMutantes++;
