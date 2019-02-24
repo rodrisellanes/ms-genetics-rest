@@ -1,0 +1,65 @@
+
+*****************
+DEPLOY IN AWS EC2
+*****************
+
+1) Get the .pem from the AWS Console
+    
+    https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/AccessingInstances.html
+
+1) Connect to EC2 virtual machine by ssh
+    
+    ssh -i ~/.ssh/MyKeyPair.pem <DNS:Public IP>
+
+2) Install docker 
+
+    sudo yum update -y
+    sudo yum install -y docker
+    sudo service docker start
+    sudo usermod -a -G docker ec2-user
+    docker info
+
+3) Ready to run your docker container
+
+    * docker pull rodrisella/ms-genetics-rest:1.1.1 (OPTIONAL)
+    
+    * docker run --name mutante_api -d --network host -p 8080:8080 ms-genetics-rest:1.1.1
+    * sudo docker run --name mutant_redis -p 6379:6379 -d redis
+    * sudo docker run --name mutante_db -d -it -p 5432:5432 -e POSTGRES_PASSWORD=password -e POSTGRES_DB=genetics postgres:latest -c max_connections=200
+
+
+4) Install redis-cli adn postgresql-cli
+
+    REDIS
+        sudo yum install gcc
+        wget http://download.redis.io/redis-stable.tar.gz && tar xvzf redis-stable.tar.gz && cd redis-stable && make
+        sudo cp src/redis-cli /usr/bin/ (OPTIONAL)
+        redis-cli --version
+
+    PSQL
+        sudo yum install -y  https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-redhat10-10-2.noarch.rpm
+        sudo sed -i "s/rhel-\$releasever-\$basearch/rhel-latest-x86_64/g" "/etc/yum.repos.d/pgdg-10-redhat.repo"
+        sudo yum install -y postgresql10
+        psql --version
+    
+    CONNECT
+        * redis-cli -h localhost -p 6379
+        * psql -h localhost -p 5432 --username=postgres --dbname=genetics
+
+5) Run Database model into the postgres container
+
+    * create schema adn;
+    * create table adn.adn_evaluados( id serial primary key, adn text not null, mutante boolean not null, fecha_creacion timestamp default now(), unique(adn) );
+    
+    * select * from adn.adn_evaluados;
+    * select nspname from pg_catalog.pg_namespace;
+
+
+6) Test microservices with curl (inside aws instance)
+    
+    curl -d '{"dna": ["TTTCCA","CAAAGC","CAACCT","AAAAGG","CACCTA","GACTTG"]}' -H "Content-Type: application/json" -X POST http://localhost:8080/api/v1.0/genetics/mutant
+
+7) Configurate Security Groups
+    
+    Create Security Group or use the once that AWS assigned for you.
+    edit --> inbound (Type, Port range and source)
