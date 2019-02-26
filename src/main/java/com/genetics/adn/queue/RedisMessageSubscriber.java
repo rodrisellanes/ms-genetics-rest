@@ -41,7 +41,6 @@ public class RedisMessageSubscriber implements MessageListener {
                         adnLeido.getAdn(),
                         adnLeido.isMutante())
                 )
-                .map(a -> new Exception(""))
                 .onErrorMap(SerializationException.class, InternalServerError::new)
                 .doOnError(InternalServerError.class, err -> log.error("Error en la deserializacion del EvaluatedDAN: {}", mensaje.toString()))
                 .doOnSubscribe(sub -> log.info("Recibe mensaje en Queue (ADN_QUEUE)"))
